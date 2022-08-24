@@ -1,0 +1,60 @@
+function checkCashRegister(price, cash, cid) {
+  let map = {
+  'ONE HUNDRED': 100,
+  TWENTY: 20,
+  TEN: 10,
+  FIVE: 5,
+  ONE: 1,
+  QUARTER: 0.25,
+  DIME: 0.1,
+  NICKEL: 0.05,
+    PENNY: 0.01
+   };
+   let cidObj = {};
+
+  for (let i = 0;i <cid.length;i++){
+    cidObj[cid[i][0]] = cid[i][1];
+  }
+
+  let cashToBeReturned = cash - price;
+  let cashRequired = cashToBeReturned;
+  let cashAvailable = [];
+  let status = '';
+
+  for (let key in map){
+    let counter = Math.floor(cashRequired/map[key]);
+    if (counter !== 0 && map[key]<=cidObj[key]){
+      if (map[key]*counter>cidObj[key]){
+      counter = cidObj[key]/map[key]
+      }
+      cashRequired = (cashRequired - map[key]*counter).toFixed(2);
+      cashAvailable.push([key,map[key]*counter]) ;
+      delete cidObj[key];
+    }
+    if (cashRequired == 0 ){
+      let closedArr = [];
+      for (let ele in cidObj){
+        if(cidObj[ele]==0){
+          closedArr.push([ele,cidObj[ele]]);
+        }
+        else{
+      status = 'OPEN';
+          break;
+        }
+      }
+      if ((closedArr.length + cashAvailable.length)==cid.length) {
+        cashAvailable.push(...closedArr);
+        status = "CLOSED";
+      }
+    }
+  }
+  if (cashRequired != 0){
+    status = "INSUFFICIENT_FUNDS";
+    return {status:status,change:[]};
+  }
+  else{
+    return {status:status,change:cashAvailable};
+  }
+}
+
+console.log(checkCashRegister(19.5, 20, [["PENNY", 0.5], ["NICKEL", 0], ["DIME", 0], ["QUARTER", 0], ["ONE", 0], ["FIVE", 0], ["TEN", 0], ["TWENTY", 0], ["ONE HUNDRED", 0]]));
